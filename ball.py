@@ -3,6 +3,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+GRAY = (100, 100, 100)
 YELLOW = (255, 255, 0)
 
 import math
@@ -31,12 +32,12 @@ class Ball:
 		# t: 현재까지 누적된 시간
 		self.t = 0
 		# s0: s(t=0), 즉 시간 t=0일때의 공의 초기 위치
-		self.s0 = _s0
+		self.s0 = s0
 		# s: 시간 t일때의 공의 위치, 즉 현재 공의 위치
 		# 우선 s0로 초기화해준다
 		self.s = [self.s0[0], self.s0[1]]
 		# v0: v(t=0), 즉 시간 t=0일때의 공의 초기 속도
-		self.v0 = _v0
+		self.v0 = v0
 		# v: 시간 t일때의 속도, 즉 현재 속도
 		self.v = [self.v0[0], self.v0[1]]
 		# color: 물체의 색상 
@@ -48,20 +49,20 @@ class Ball:
 		# 뉴턴의 제 2법칙 가속도 = 힘/질량
 		# 공의 가속도는 힘에 비례, 질량에 반비례함
 		# 중력에 의해 발생되는 가속도는 이미  self.a에 적용되어 있음
-		self.a[0] + = force[0] / self.mass 
-		self.a[1] + = force[1] / self.mass 
+		self.a[0] += force[0] / self.mass 
+		self.a[1] += force[1] / self.mass 
 
 	# 물체의 이전 위치에서 delta_t 초가 지난 후 위치를 구한다
 	# s(t)' = s(t) +  s(delta_t)
-	def deltaPos(self, _delta_t=0.01):
+	def computePos(self, delta_t=0.01):
 		# a = 상수, 즉 등가속도 운동일 경우만 고려
 		# v(t) = v0 + a*t; 여기서 v0는 이전 속도
-		self.v[0] = self.v0[0] + acc[0] * _delta_t
-		self.v[1] = self.v0[1] + acc[1] * _delta_t
+		self.v[0] = self.v0[0] + self.a[0] * delta_t
+		self.v[1] = self.v0[1] + self.a[1] * delta_t
 		# s(t) = v0*t + (1/2)*a*delta^2
 		#      = s0  +  s(delta_t); s는 위치, v0는 초기 속도 
-		self.s[0] = self.s0[0] + (self.v[0] * _delta_t)
-		self.s[1] = self.s0[1] + (self.v[1] * _delta_t)
+		self.s[0] = self.s0[0] + (self.v[0] * delta_t)
+		self.s[1] = self.s0[1] + (self.v[1] * delta_t)
 		# 현재 업데이트된 속도와 위치값이 다음 delta_t
 		# 에서는 초기 속도, 초기 위치값으로 세팅
 		self.v0[0] = self.v[0]
@@ -69,11 +70,15 @@ class Ball:
 		self.s0[0] = self.s[0]
 		self.s0[1] = self.s[1]
 		# delta_t가 지난 후 현재 시간을 업데이트한다
-		self.t += _delta_t
+		self.t += delta_t
 	
 	# 원과 원의 충돌 감지
-	def collide(self, _other):
-		dist = math.sqrt((self.s[0] - _other.s[0]) ** 2 +  (self.s[1] - _other.s[1]) ** 2)
+	def collide(self, other):
+		# dist: 유클리드 거리로 계산한 두 원의 중점 사이의 거리
+		# https://ko.wikipedia.org/wiki/%EC%9C%A0%ED%81%B4%EB%A6%AC%EB%93%9C_%EA%B1%B0%EB%A6%AC
+		dist = math.sqrt((self.s[0] - other.s[0]) ** 2 +  (self.s[1] - other.s[1]) ** 2)
+		# 만약 두 중점 사이의 거리가 두 원의 반지를을 합한 것보다 작거나 같으면 
+		# 충돌이 일어났다는 뜻
 		if dist <= self.radius + self.radius:
 			return True
 		return False

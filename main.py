@@ -10,43 +10,13 @@ clock = pygame.time.Clock()
 # 오브젝트 만들기
 # 오브젝트 모양은 공 모양의 객체
 # 물리시뮬레이션에 필요한 속성을 넣어준다
-
-ball_1 = Ball(_radius=10,
-	_color=GREEN,
-	_mass=0.3,
-	_s0=[100, 500],
-	_v0=[20, -75],
-	_a=[2, 0])
-ball_2 = Ball(_radius=10,
-	_color=BLUE,
-	_mass=1,
-	_s0=[100, 500],
-	_v0=[20, -75],
-	_a=[2, 0])
-ball_3 = Ball(_radius=10,
-	_color=YELLOW,
-	_mass=2,
-	_s0=[100, 500],
-	_v0=[0, -75],
-	_a=[0, 0])
-ball_4 = Ball(_radius=10,
-	_color=WHITE,
-	_mass=3,
-	_s0=[100, 500],
-	_v0=[50, -65],
-	_a=[2, 0])
-
-print(f"degrees: {math.degrees(math.atan(ball_1.v0[1] / ball_1.v0[0]))}")
-
-
-enemy = Ball(_radius=50,
-	_color=RED,
-	_mass=1,
-	_s0=[700, 450],
-	_v0=[0, 0],
-	_a=[0, 0])
-
-
+ball1 = Ball(mass=0.3, 	s0=[100, 500], v0=[20, -75], 	color=GREEN)
+ball2 = Ball(mass=1, 	s0=[100, 500], v0=[20, -75], 	color=BLUE)
+ball3 = Ball(mass=2, 	s0=[100, 500], v0=[0, -75], 	color=YELLOW)
+ball4 = Ball(mass=3, 	s0=[100, 500], v0=[50, -65], 	color=WHITE)
+F= [50, 0]
+ball3.applyForce(F)
+enemy = Ball(radius=50, color=RED, mass=1, s0=[700, 450], v0=[0, 0], a=[0, 0])
 
 running = True
 while running:
@@ -55,25 +25,26 @@ while running:
 			running = False
 	
 	screen.fill(BLACK)
-	pygame.draw.circle(screen, ball_1.color, ball_1.s, ball_1.radius, 0)
-	pygame.draw.circle(screen, ball_2.color, ball_2.s, ball_2.radius, 0)
-	pygame.draw.circle(screen, ball_3.color, ball_3.s, ball_3.radius, 0)
-	pygame.draw.circle(screen, ball_4.color, ball_4.s, ball_4.radius, 0)
+	# 원들을 그려준다
+	pygame.draw.circle(screen, ball1.color, ball1.s, ball1.radius, 0)
+	pygame.draw.circle(screen, ball2.color, ball2.s, ball2.radius, 0)
+	pygame.draw.circle(screen, ball3.color, ball3.s, ball3.radius, 0)
+	pygame.draw.circle(screen, ball4.color, ball4.s, ball4.radius, 0)
 	pygame.draw.circle(screen, enemy.color, enemy.s, enemy.radius, 0)
-	# 충돌 감지
-	if ball_1.collide(enemy):
-		enemy.color = BLACK
-	if ball_2.collide(enemy):
-		enemy.color = BLACK
-	if ball_3.collide(enemy):
-		enemy.color = BLACK
-	if ball_4.collide(enemy):
-		enemy.color = BLACK
-	# delta_t만큼씩 시간을 흐르게 한 후 변한 위치를 계산해서 가져온다
-	ball_1.calcPos(1/60)
-	ball_2.calcPos(1/60)
-	ball_3.calcPos(1/60)
-	ball_4.calcPos(1/60)
+	# 적과 충돌 감지
+	if ball1.collide(enemy):
+		enemy.color = GRAY
+	if ball2.collide(enemy):
+		enemy.color = GRAY
+	if ball3.collide(enemy):
+		enemy.color = GRAY
+	if ball4.collide(enemy):
+		enemy.color = GRAY
+	# deltat만큼씩 시간을 흐른 후 현 위치를 갱신한다
+	ball1.computePos(1/60)
+	ball2.computePos(1/60)
+	ball3.computePos(1/60)
+	ball4.computePos(1/60)
 	pygame.display.update()	
 	clock.tick(360)
 
