@@ -1,22 +1,20 @@
 import pygame
 from ball import *
-import math
-
+from random import randint
 w, h = 800, 600
-pygame.init()
 screen = pygame.display.set_mode((w,h))
 clock = pygame.time.Clock()
+ball_1 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-40,40)], mass=randint(1,3), color=YELLOW)
+ball_2 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90,0)], mass=randint(1,3), color=BLUE)
+ball_3 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90,40)], mass=randint(1,3), color=GREEN)
+ball_3.applyForce([-20, -40])
+ball_4 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90, 0)], mass=randint(1,3), color=WHITE)
+ball_5 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90, 0)], mass=randint(1,3), color=CYAN)
+ball_6 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90,0)], mass=randint(1,3), color=MAGENTA)
 
-# 오브젝트 만들기
-# 오브젝트 모양은 공 모양의 객체
-# 물리시뮬레이션에 필요한 속성을 넣어준다
-ball1 = Ball(mass=0.3, 	s0=[100, 500], v0=[20, -75], 	color=GREEN)
-ball2 = Ball(mass=1, 	s0=[100, 500], v0=[20, -75], 	color=BLUE)
-ball3 = Ball(mass=2, 	s0=[100, 500], v0=[0, -75], 	color=YELLOW)
-ball4 = Ball(mass=3, 	s0=[100, 500], v0=[50, -65], 	color=WHITE)
-F= [50, 0]
-ball3.applyForce(F)
-enemy = Ball(radius=50, color=RED, mass=1, s0=[700, 450], v0=[0, 0], a=[0, 0])
+balls = [ball_1, ball_2, ball_3, ball_4, ball_5,  ball_6]
+
+enemy = Ball(radius=30, color=RED, s0=[700, 450])
 
 running = True
 while running:
@@ -25,26 +23,21 @@ while running:
 			running = False
 	
 	screen.fill(BLACK)
-	# 원들을 그려준다
-	pygame.draw.circle(screen, ball1.color, ball1.s, ball1.radius, 0)
-	pygame.draw.circle(screen, ball2.color, ball2.s, ball2.radius, 0)
-	pygame.draw.circle(screen, ball3.color, ball3.s, ball3.radius, 0)
-	pygame.draw.circle(screen, ball4.color, ball4.s, ball4.radius, 0)
+	for ball in balls:
+		pygame.draw.circle(screen, ball.color, ball.s, ball.radius, 0)
+
 	pygame.draw.circle(screen, enemy.color, enemy.s, enemy.radius, 0)
-	# 적과 충돌 감지
-	if ball1.collide(enemy):
-		enemy.color = GRAY
-	if ball2.collide(enemy):
-		enemy.color = GRAY
-	if ball3.collide(enemy):
-		enemy.color = GRAY
-	if ball4.collide(enemy):
-		enemy.color = GRAY
-	# deltat만큼씩 시간을 흐른 후 현 위치를 갱신한다
-	ball1.computePos(1/60)
-	ball2.computePos(1/60)
-	ball3.computePos(1/60)
-	ball4.computePos(1/60)
-	pygame.display.update()	
+	pygame.display.update()
+	# 적 공객체와 충돌을 감지 판단합니다
+	for ball in balls:
+		if ball.collide(enemy):
+			enemy.color = GRAY
+
+
+	# 새로운 객체들의 위치 계산
+	for ball in balls:
+		ball.computePos(1/60)
+
+	# print(ball_1.s)
 	clock.tick(360)
 
