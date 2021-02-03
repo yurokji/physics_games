@@ -1,20 +1,15 @@
 import pygame
 from ball import *
-from random import randint
+from aabb import *
+import math
+
 w, h = 800, 600
+pygame.init()
 screen = pygame.display.set_mode((w,h))
 clock = pygame.time.Clock()
-ball_1 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-40,40)], mass=randint(1,3), color=YELLOW)
-ball_2 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90,0)], mass=randint(1,3), color=BLUE)
-ball_3 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90,40)], mass=randint(1,3), color=GREEN)
-ball_3.applyForce([-20, -40])
-ball_4 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90, 0)], mass=randint(1,3), color=WHITE)
-ball_5 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90, 0)], mass=randint(1,3), color=CYAN)
-ball_6 = Ball(s0=[randint(100,600), randint(200, 600)], v0 = [randint(-20,20),randint(-90,0)], mass=randint(1,3), color=MAGENTA)
 
-balls = [ball_1, ball_2, ball_3, ball_4, ball_5,  ball_6]
-
-enemy = Ball(radius=30, color=RED, s0=[700, 450])
+square1 = AABB(mass=2, 	s0=[100, 500], v0=[40, -75], size=(20, 20),	color=GREEN)
+enemy = AABB(mass=10, s0=[700, 450], size=(40, 40), color=RED)
 
 running = True
 while running:
@@ -23,21 +18,15 @@ while running:
 			running = False
 	
 	screen.fill(BLACK)
-	for ball in balls:
-		pygame.draw.circle(screen, ball.color, ball.s, ball.radius, 0)
-
-	pygame.draw.circle(screen, enemy.color, enemy.s, enemy.radius, 0)
-	pygame.display.update()
-	# 적 공객체와 충돌을 감지 판단합니다
-	for ball in balls:
-		if ball.collide(enemy):
-			enemy.color = GRAY
-
-
-	# 새로운 객체들의 위치 계산
-	for ball in balls:
-		ball.computePos(1/60)
-
-	# print(ball_1.s)
+	pygame.draw.rect(screen, square1.color, square1.getRect(), 0)
+	pygame.draw.rect(screen, enemy.color, enemy.getRect(), 0)
+	# 적과 충돌 감지
+	if square1.collide(enemy):
+		enemy.color = GRAY
+	else:
+		enemy.color = RED
+	# deltat만큼씩 시간을 흐른 후 현 위치를 갱신한다
+	square1.computePos(1/60)
+	pygame.display.update()	
 	clock.tick(360)
 
