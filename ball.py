@@ -24,6 +24,7 @@ class Ball:
 		# 현재는 물체에 작용하는 힘이 없으므로
 		# 최종 가속도 방향은 중력 방향뿐이다.
 		self.a = [self.g[0], self.g[1]]
+		self.force = [0, 0]
 		# mass: 질량
 		self.mass = mass
 		# 만약 질량이 1보다 크면 
@@ -50,8 +51,7 @@ class Ball:
 		# 뉴턴의 제 2법칙 가속도 = 힘/질량
 		# 공의 가속도는 힘에 비례, 질량에 반비례함
 		# 중력에 의해 발생되는 가속도는 이미  self.a에 적용되어 있음
-		self.a[0] += force[0] / self.mass 
-		self.a[1] += force[1] / self.mass 
+		return  [force[0] / self.mass, force[0] / self.mass] 
 
 	# 물체의 이전 위치에서 delta_t 초가 지난 후 위치를 구한다
 	# s(t)' = s(t) +  s(delta_t)
@@ -61,13 +61,21 @@ class Ball:
 		# 	a[1] = self.a[1] - 10
 		# else:
 		# 	a[1] = self.a[1]
+		ak1 = self.applyForce(self.force)
+		# print(self.force)
 		if collided_1:
 			a[1] = self.a[1] - 10
+			a[0] = a[0] - ak1[0]
+			# print(ak1)
 		else:
 			a[1] = self.a[1]
-   
-   
+			a[0] = a[0] - ak1[0]
+		
+
 		if collided_2:
+			# print(ak)
+			a[1] = a[1]
+			# print(a)
 			self.v0[0] *=  1 
 			self.v0[1] *=  -0.9
 		# a = 상수, 즉 등가속도 운동일 경우만 고려
@@ -90,7 +98,7 @@ class Ball:
   
 
 
-		
+	
 		# delta_t가 지난 후 현재 시간을 업데이트한다
 		self.t += delta_t
 	
@@ -136,11 +144,15 @@ class Ball:
 	
 			dist_x = cx - testx
 			dist_y = cy - testy
-			dist = math.sqrt(dist_x ** 2 + dist_y ** 2)
-
+			dist = math.sqrt(dist_x *dist_x + dist_y *dist_y)
+			print(dist)
 			if dist <= self.radius:
+				self.force = [other.mu_k, 0]
+				# print(self.force)
 				return True
 			else:
+				self.force = [0, 0]
+				print(self.force)
 				return False
 				
 			

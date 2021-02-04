@@ -15,7 +15,7 @@ class AABB:
 	# 화면에 공을 표시할 속성(_radius: 반지름, , _color) 넣어
 	# 객체를 초기화시켜주세요
 	def __init__(self,
-		mass=1, s0=[0, 0], v0=[0, 0], a=[0, 0], size=[10,10], color=WHITE):
+		mass=1, s0=[0, 0], v0=[0, 0], a=[0, 0], size=[10,10], mu_k=0, color=WHITE):
 		self.g = [0, 9.8]	
 		self.a = [self.g[0], self.g[1]]
 		self.mass = mass
@@ -25,6 +25,7 @@ class AABB:
 		self.s = [self.s0[0], self.s0[1]]
 		self.v0 = v0
 		self.v = [self.v0[0], self.v0[1]]
+		self.mu_k = mu_k
 		self.color = color
 
 

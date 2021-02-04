@@ -11,8 +11,9 @@ clock = pygame.time.Clock()
 
 
 ball_1 = Ball(s0=[100,91], v0=[10, 0], mass=1, color=GREEN)
-floor_1 = AABB(mass=10, s0=[50, 100], size=(300, 10), color=WHITE)
-floor_2 = AABB(mass=10, s0=[400, 400], size=(300, 10), color=WHITE)
+floor_1 = AABB(mass=10, s0=[50, 100], mu_k=0.9, size=(300, 10), color=WHITE)
+floor_2 = AABB(mass=10, s0=[400, 400], mu_k=0, size=(300, 10), color=WHITE)
+
 balls = [ball_1]
 
 running = True
@@ -35,17 +36,17 @@ while running:
 	
 	for i, ball in enumerate(balls):
 		collided_1 = ball.collide(floor_1)
-		collided_2 = ball.collide(floor_2)
+		# collided_2 = ball.collide(floor_2)
 		if collided_1:
 			floor_1.color = GRAY
 		else:
 			floor_1.color = RED
 			
-		if collided_2:
-			floor_2.color = GRAY
-		else:
-			floor_2.color = RED
-		ball.computePos(collided_1, collided_2, 1/60)
+		# if collided_2:
+		# 	floor_2.color = GRAY
+		# else:
+		# 	floor_2.color = RED
+		ball.computePos(collided_1, False, 1/60)
 		# if not ball.isValidPos((w,h)):
 			
 			
