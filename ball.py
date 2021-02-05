@@ -58,14 +58,19 @@ class Ball:
 	# 물체의 이전 위치에서 delta_t 초가 지난 후 위치를 구한다
 	# s(t)' = s(t) +  s(delta_t)
 	def computePos(self, collided_1, collided_2, delta_t=0.01):
-		# if collided_1:
-		Fn = Vec2(self.g) * math.cos(self.theta) * self.mass
-		Fg = Vec2(self.g) * self.mass
-		
-		a /= self.mass
+		a = [0,0]
+		if collided_1:
+			a[0] = self.g[0] * math.sin(self.theta)
+			a[1] = -self.g[1] * math.cos(self.theta)
+		else:
+			a[0] = self.g[0]
+			a[1] = self.g[1]
+		# Fg = Vec2(self.g) * self.mass
+
+
 		# else:
 		# 	a = Vec2(self.g)
-		a = a.toList()
+		# a = a.toList()
 		print(math.degrees(self.theta), a)
 		# if collided_1:
 		# 	a[1] = self.a[1] - 10

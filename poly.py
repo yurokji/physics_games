@@ -30,9 +30,7 @@ class Polygon:
 		self.color = color
 		A = self.points[2][0]-self.points[0][0]
 		B = self.points[2][1]-self.points[0][1]
-		C = math.sqrt(A * A + B * B)
-		costheta = A / C
-		self.theta = math.acos(costheta)
+		self.theta = math.atan(A/B)
 
 
 

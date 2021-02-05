@@ -12,7 +12,7 @@ clock = pygame.time.Clock()
 
 
 pts=[(50,200), (30, 220), (330, 520), (350, 500)]
-ball = Ball(s0=[64,201], v0=[10, 0], mass=2, color=GREEN)
+ball = Ball(s0=[64,201], v0=[2, 0], mass=2, color=GREEN)
 floor_1 = Polygon(mass=10, points=pts, size=(300, 10), color=WHITE)
 
 balls = [ball]
