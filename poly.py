@@ -28,6 +28,12 @@ class Polygon:
 		self.v = [self.v0[0], self.v0[1]]
 		self.mu_k = mu_k
 		self.color = color
+		A = self.points[2][0]-self.points[0][0]
+		B = self.points[2][1]-self.points[0][1]
+		C = math.sqrt(A * A + B * B)
+		costheta = A / C
+		self.theta = math.acos(costheta)
+
 
 
 	# 물체에 중력 이외의 힘을 가한다

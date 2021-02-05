@@ -8,7 +8,7 @@ pygame.init()
 screen = pygame.display.set_mode((w,h))
 clock = pygame.time.Clock()
 
-square_1 = AABB(mass=2, 	s0=[100, 500], v0=[20, -45], size=(20, 20),	color=GREEN)
+square_1 = AABB(mass=2, 	s0=[200, 500], v0=[20, -45], size=(20, 20),	color=GREEN)
 ball_1 = Ball(s0=[200,500], v0=[35, -75], mass=1, color=BLUE)
 enemy = AABB(mass=10, s0=[700, 450], size=(40, 40), color=RED)
 

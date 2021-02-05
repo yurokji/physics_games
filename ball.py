@@ -6,8 +6,10 @@ BLACK = (0, 0, 0)
 GRAY = (100, 100, 100)
 YELLOW = (255, 255, 0)
 from aabb import *
-
+from poly import *
+from vec2 import *
 import math
+
 class Ball:
 	# 물리 시뮬레이션에 필요한 속성들
 	# (_mass: 질량, _s0: 초기 위치, _v0: 초기 속도, _acc: 물체의 가속도)
@@ -23,7 +25,7 @@ class Ball:
 		self.g = [0, 10]	
 		# 현재는 물체에 작용하는 힘이 없으므로
 		# 최종 가속도 방향은 중력 방향뿐이다.
-		self.a = [self.g[0], self.g[1]]
+		self.a = [0, 0]
 		self.force = [0, 0]
 		# mass: 질량
 		self.mass = mass
@@ -44,7 +46,7 @@ class Ball:
 		self.v = [self.v0[0], self.v0[1]]
 		# color: 물체의 색상 
 		self.color = color
-
+		self.theta = 0
 
 	# 물체에 중력 이외의 힘을 가한다
 	def applyForce(self, force):
@@ -56,28 +58,27 @@ class Ball:
 	# 물체의 이전 위치에서 delta_t 초가 지난 후 위치를 구한다
 	# s(t)' = s(t) +  s(delta_t)
 	def computePos(self, collided_1, collided_2, delta_t=0.01):
-		a = [self.a[0], self.a[1]]
+		# if collided_1:
+		Fn = Vec2(self.g) * math.cos(self.theta) * self.mass
+		Fg = Vec2(self.g) * self.mass
+		
+		a /= self.mass
+		# else:
+		# 	a = Vec2(self.g)
+		a = a.toList()
+		print(math.degrees(self.theta), a)
 		# if collided_1:
 		# 	a[1] = self.a[1] - 10
 		# else:
 		# 	a[1] = self.a[1]
-		ak1 = self.applyForce(self.force)
-		# print(self.force)
-		if collided_1:
-			a[1] = self.a[1] - 10
-			a[0] = a[0] - ak1[0]
-			# print(ak1)
-		else:
-			a[1] = self.a[1]
-			a[0] = a[0] - ak1[0]
-		
+		# ak1 = self.applyForce(self.force)
 
-		if collided_2:
-			# print(ak)
-			a[1] = a[1]
-			# print(a)
-			self.v0[0] *=  1 
-			self.v0[1] *=  -0.9
+		# if collided_1:
+		# 	# print(ak)
+		# 	a[1] = a[1]
+		# 	# print(a)
+		# 	self.v0[0] *=  1 
+		# 	self.v0[1] *=  -0.9
 		# a = 상수, 즉 등가속도 운동일 경우만 고려
 		# v(t) = v0 + a*t; 여기서 v0는 이전 속도
 		self.v[0] = self.v0[0] + a[0] * delta_t
@@ -113,11 +114,12 @@ class Ball:
 		else:
 			return True
 	def collide(self, other):
+		self.theta = other.theta
 		# print(type(self), type(other))
 		# 원과 원의 충돌 감지
 		if isinstance(other, Ball):
 			# dist: 유클리드 거리로 계산한 두 원의 중점 사이의 거리
-			# https://ko.wikipedia.org/wiki/%EC%9C%A0%ED%81%B4%EB%A6%AC%EB%93%9C_%EA%B1%B0%EB%A6%AC
+			# https:#ko.wikipedia.org/wiki/%EC%9C%A0%ED%81%B4%EB%A6%AC%EB%93%9C_%EA%B1%B0%EB%A6%AC
 			dist = math.sqrt((self.s[0] - other.s[0]) ** 2 +  (self.s[1] - other.s[1]) ** 2)
 			# 만약 두 중점 사이의 거리가 두 원의 반지를을 합한 것보다 작거나 같으면 
 			# 충돌이 일어났다는 뜻
@@ -125,7 +127,6 @@ class Ball:
 				return True
 			return False
 		elif isinstance(other, AABB):
-			
 			otherRect = other.getRect()
 			cx = self.s[0]
 			cy = self.s[1]
@@ -147,14 +148,161 @@ class Ball:
 			dist = math.sqrt(dist_x *dist_x + dist_y *dist_y)
 			print(dist)
 			if dist <= self.radius:
-				self.force = [other.mu_k, 0]
+				self.theta = other.theta
 				# print(self.force)
 				return True
 			else:
-				self.force = [0, 0]
-				print(self.force)
+				self.theta = other.theta
+				# print(self.theta)
 				return False
+		
+		elif isinstance(other, Polygon):
+			# go through each of the points, plus
+			# the next vertex in the list
+			if self.polyCircle(other.points, self.s[0], self.s[1], self.radius):
+				print("Touched")
+				return True
+			else:
+				print("No Touched")
+				return False
+	
+
+
+	def polyCircle(self, points, cx, cy, r):
+		
+		len_p = len(points)
+		next_p = 0;
+		for curr_p in range(len_p):
+			# get next vertex in list
+			# if we've hit the end, wrap around to 0
+			next_p = curr_p + 1
+			if next_p == len_p:
+				next_p = 0
+			# get the PVectors at our current position
+			# this makes our if statement a little cleaner
+			vc = Vec2(points[curr_p])    # c for "current"
+			vn = Vec2(points[next_p])       # n for "next"
+			# check for collision between the circle and
+			# a line formed between the two points
+			collision = self.lineCircle(vc.x, vc.y, vn.x, vn.y, cx, cy, r)
+			if collision:
 				
-			
-			
-			
+				return True
+			# the above algorithm only checks if the circle
+			# is touching the edges of the polygon – in most
+			# cases this is enough, but you can un-comment the
+			# following code to also test if the center of the
+			# circle is inside the polygon
+			# boolean centerInside = polygonPoint(points, cx,cy);
+			# if (centerInside) return true;
+		# otherwise, after all that, return false
+		return False
+
+	# LINE/CIRCLE
+	def lineCircle(self, x1, y1, x2, y2, cx, cy, r):
+		# is either end INSIDE the circle?
+		# if so, return true immediately
+		inside1 = self.pointCircle(x1,y1, cx,cy,r)
+		inside2 = self.pointCircle(x2,y2, cx,cy,r)
+		if inside1 or inside2:
+			return True
+
+		# get length of the line
+		distX = x1 - x2
+		distY = y1 - y2
+		line_length = math.sqrt((distX * distX) + (distY * distY))
+
+		# get dot product of the line and circle
+		v1 = Vec2([cx - x1, cy - y1])
+		v2 = Vec2([x2 - x1, y2 - y1])
+		dot = v1.dot(v2) / (line_length * line_length)
+
+		# find the closest point on the line
+		closestX = x1 + (dot * (x2 - x1))
+		closestY = y1 + (dot * (y2 - y1))
+
+		# is this point actually on the line segment?
+		# if so keep going, but if not, return false
+		onSegment = self.linePoint(x1, y1, x2, y2, closestX, closestY)
+		if not onSegment:
+			return False
+
+
+		# get distance to closest point
+		distX = closestX - cx
+		distY = closestY - cy
+		distance = math.sqrt((distX * distX) + (distY * distY))
+
+		# is the circle on the line?
+		if distance <= r:
+			return True
+		return False
+	
+	def linePoint(self, x1, y1, x2, y2, px, py):
+		# get distance from the point to the two ends of the line
+		d1 = self.getDist(px, py, x1, y1)
+		d2 = self.getDist(px, py, x2, y2)
+
+		# get the length of the line
+		lineLen = self.getDist(x1, y1, x2, y2)
+
+		# since floats are so minutely accurate, add
+		# a little buffer zone that will give collision
+		buffer = 0.1    # higher # = less accurate
+
+		# if the two distances are equal to the line's
+		# length, the point is on the line!
+		# note we use the buffer here to give a range, rather
+		# than one #
+		if (d1 + d2) >= (lineLen - buffer) and \
+			(d1 + d2) <= (lineLen + buffer):
+			return True
+		return False
+
+	 
+
+	# POINT/CIRCLE
+	def pointCircle(self, px, py, cx, cy, r):
+		# get distance between the point and circle's center
+		# using the Pythagorean Theorem
+		distX = px - cx
+		distY = py - cy
+		distance = math.sqrt((distX * distX) + (distY * distY))
+
+		# if the distance is less than the circle's 
+		# radius the point is inside!
+		if distance <= r:
+			return True
+		return False
+
+	# POLYGON/POINT
+	# only needed if you're going to check if the circle
+	# is INSIDE the polygon
+	def polygonPoint(self, points, px, py):
+		collision = false
+		# go through each of the points, plus the next
+		# vertex in the list
+		len_p = len(points)
+		next_p = 0;
+		for curr_p in range(len_p):
+			# get next vertex in list
+			# if we've hit the end, wrap around to 0
+			next_p = curr_p + 1
+			if next_p == len_p:
+				next_p = 0
+
+			# get the PVectors at our current position
+			# this makes our if statement a little cleaner
+			vc = Vec2(points[curr_p])    # c for "current"
+			vn = Vec2(points[next_p])    # n for "next"
+
+			# compare position, flip 'collision' variable
+			# back and forth
+			if (((vc.y > py and vn.y < py) or (vc.y < py and vn.y > py)) and \
+				(px < (vn.x - vc.x) * (py - vc.y) / (vn.y - vc.y) + vc.x)):
+				collision = not collision
+		return collision
+
+
+	def getDist(self, x1, y1, x2, y2):
+		return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
