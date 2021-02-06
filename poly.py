@@ -16,7 +16,7 @@ class Polygon:
 	# 객체를 초기화시켜주세요
 	def __init__(self,
 		mass=1, points=[(50,200), (30, 220), (330, 520), (350, 500)], v0=[0, 0], a=[0, 0], size=[10,10], mu_k=0, color=WHITE):
-		self.g = [0, 9.8]	
+		self.g = [0, 10]	
 		self.a = [self.g[0], self.g[1]]
 		self.mass = mass
 		self.size = size
@@ -28,10 +28,11 @@ class Polygon:
 		self.v = [self.v0[0], self.v0[1]]
 		self.mu_k = mu_k
 		self.color = color
-		A = self.points[2][0]-self.points[0][0]
-		B = self.points[2][1]-self.points[0][1]
-		self.theta = math.atan(A/B)
-
+		A = self.points[3][0]-self.points[0][0]
+		B = self.points[3][1]-self.points[0][1]
+		print(A,B)
+		# self.theta = math.atan(A/B)
+		self.theta = 0
 
 
 	# 물체에 중력 이외의 힘을 가한다

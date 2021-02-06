@@ -7,7 +7,7 @@ GRAY = (100, 100, 100)
 YELLOW = (255, 255, 0)
 from aabb import *
 from poly import *
-from vec2 import *
+from mymath import *
 import math
 
 class Ball:
@@ -17,7 +17,7 @@ class Ball:
 	# 객체를 초기화시켜주세요
 	def __init__(self,
 		mass=1, s0=[0, 0], v0=[0, 0], a=[0, 0], radius=10, color=WHITE):
-
+		self.count = 0
 		# g: 중력 가속도
 		# x방향으로는 중력이 작용하지 않으므로 0을 넣어준다 
 		# y방향으로는 9.8이 아닌 -9.8을 넣어준다.
@@ -31,7 +31,7 @@ class Ball:
 		self.mass = mass
 		# 만약 질량이 1보다 크면 
 		# 질량의 배수만큼 공의 크기를 늘려 화면에 보여준다
-		self.radius = radius * self.mass
+		self.radius = radius
 		
 		# t: 현재까지 누적된 시간
 		self.t = 0
@@ -58,32 +58,28 @@ class Ball:
 	# 물체의 이전 위치에서 delta_t 초가 지난 후 위치를 구한다
 	# s(t)' = s(t) +  s(delta_t)
 	def computePos(self, collided_1, collided_2, delta_t=0.01):
-		a = [0,0]
+		a = [0, 0]
 		if collided_1:
-			a[0] = self.g[0] * math.sin(self.theta)
-			a[1] = -self.g[1] * math.cos(self.theta)
+			a[0] =  self.g[1]*math.sin(self.theta) *math.sin(self.theta) / self.mass
+			a[1] =  self.g[1]*math.sin(self.theta) *math.sin(self.theta) / self.mass
 		else:
-			a[0] = self.g[0]
-			a[1] = self.g[1]
-		# Fg = Vec2(self.g) * self.mass
+			a[0] = self.g[0] / self.mass
+			a[1] = self.g[1] / self.mass
+
+		if collided_1:
+			N = Vec2([1,1]).normalize()
+			Vi = Vec2(self.v0)
+			vmag = Vi.length()
+			if vmag <= 0.0001:
+				Vi = Vec2([0,0])
+			else:
+				Vi = Vi.normalize()
+			cos_phi = N.dot(Vi)
+			Vo = N * 2 * cos_phi - Vi
+			Vo = Vo * vmag
+			self.v0 = Vo.toList()
 
 
-		# else:
-		# 	a = Vec2(self.g)
-		# a = a.toList()
-		print(math.degrees(self.theta), a)
-		# if collided_1:
-		# 	a[1] = self.a[1] - 10
-		# else:
-		# 	a[1] = self.a[1]
-		# ak1 = self.applyForce(self.force)
-
-		# if collided_1:
-		# 	# print(ak)
-		# 	a[1] = a[1]
-		# 	# print(a)
-		# 	self.v0[0] *=  1 
-		# 	self.v0[1] *=  -0.9
 		# a = 상수, 즉 등가속도 운동일 경우만 고려
 		# v(t) = v0 + a*t; 여기서 v0는 이전 속도
 		self.v[0] = self.v0[0] + a[0] * delta_t
@@ -151,7 +147,7 @@ class Ball:
 			dist_x = cx - testx
 			dist_y = cy - testy
 			dist = math.sqrt(dist_x *dist_x + dist_y *dist_y)
-			print(dist)
+			# print(dist)
 			if dist <= self.radius:
 				self.theta = other.theta
 				# print(self.force)
@@ -165,10 +161,11 @@ class Ball:
 			# go through each of the points, plus
 			# the next vertex in the list
 			if self.polyCircle(other.points, self.s[0], self.s[1], self.radius):
-				print("Touched")
+				# print("Touched")
 				return True
 			else:
-				print("No Touched")
+				self.count += 1
+				print(f"No Touched {self.count} times")
 				return False
 	
 
@@ -176,7 +173,7 @@ class Ball:
 	def polyCircle(self, points, cx, cy, r):
 		
 		len_p = len(points)
-		next_p = 0;
+		next_p = 0
 		for curr_p in range(len_p):
 			# get next vertex in list
 			# if we've hit the end, wrap around to 0

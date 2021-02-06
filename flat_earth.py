@@ -46,7 +46,7 @@ while running:
 		# 	floor_2.color = GRAY
 		# else:
 		# 	floor_2.color = RED
-		ball.computePos(collided_1, False, 1/60)
+		ball.computePos(collided_1, False, 1/360)
 		# if not ball.isValidPos((w,h)):
 			
 			

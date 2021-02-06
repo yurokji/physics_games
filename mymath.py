@@ -59,3 +59,6 @@ class Vec2:
 			return Vec2([self.x / v, self.y / v])
 		else:
 			raise Exception(v, "is not supported in Vec2")
+
+
+
