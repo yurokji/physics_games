@@ -22,7 +22,7 @@ class Ball:
 		# x방향으로는 중력이 작용하지 않으므로 0을 넣어준다 
 		# y방향으로는 9.8이 아닌 -9.8을 넣어준다.
 		# (화면 좌표 아래방향은 y가 증가하는 방향이므로)
-		self.g = [0, 10]	
+		self.g = [0, 10 ]	
 		# 현재는 물체에 작용하는 힘이 없으므로
 		# 최종 가속도 방향은 중력 방향뿐이다.
 		self.a = [0, 0]
@@ -47,28 +47,29 @@ class Ball:
 		# color: 물체의 색상 
 		self.color = color
 		self.theta = 0
+		self.normal = Vec2([0,1])
 
 	# 물체에 중력 이외의 힘을 가한다
 	def applyForce(self, force):
 		# 뉴턴의 제 2법칙 가속도 = 힘/질량
 		# 공의 가속도는 힘에 비례, 질량에 반비례함
 		# 중력에 의해 발생되는 가속도는 이미  self.a에 적용되어 있음
-		return  [force[0] / self.mass, force[0] / self.mass] 
+		return  [force[0] / self.mass, force[0] / self.mass]
 
 	# 물체의 이전 위치에서 delta_t 초가 지난 후 위치를 구한다
 	# s(t)' = s(t) +  s(delta_t)
-	def computePos(self, collided_1, collided_2, delta_t=0.01):
+	def computePos(self, collided, delta_t=0.01):
 		a = [0, 0]
-		if collided_1:
-			a[0] =  self.g[1]*math.sin(self.theta) *math.sin(self.theta) / self.mass
+		if collided:
+			a[0] =  self.g[1]*math.sin(self.theta) *math.cos(self.theta) / self.mass
 			a[1] =  self.g[1]*math.sin(self.theta) *math.sin(self.theta) / self.mass
 		else:
 			a[0] = self.g[0] / self.mass
 			a[1] = self.g[1] / self.mass
 
-		if collided_1:
-			N = Vec2([1,1]).normalize()
-			Vi = Vec2(self.v0)
+		if collided:
+			N = self.normal
+			Vi = Vec2(self.v0) * -1
 			vmag = Vi.length()
 			if vmag <= 0.0001:
 				Vi = Vec2([0,0])
@@ -76,10 +77,16 @@ class Ball:
 				Vi = Vi.normalize()
 			cos_phi = N.dot(Vi)
 			Vo = N * 2 * cos_phi - Vi
-			Vo = Vo * vmag
+			Vo = Vo * vmag *1
 			self.v0 = Vo.toList()
 
-
+			# print(f"N: {self.normal.toList()}")
+			# print(f"Vi: {Vi.toList()}")
+			# print(f"v0: {self.v0}")
+			# print(f"v: {self.v}")
+			# print(f"a: {a}, theta: {self.theta}")		
+		# if not collided:
+		# 	input()
 		# a = 상수, 즉 등가속도 운동일 경우만 고려
 		# v(t) = v0 + a*t; 여기서 v0는 이전 속도
 		self.v[0] = self.v0[0] + a[0] * delta_t
@@ -150,10 +157,12 @@ class Ball:
 			# print(dist)
 			if dist <= self.radius:
 				self.theta = other.theta
-				# print(self.force)
+				self.normal = other.normal
+				# print(self.theta)
 				return True
 			else:
-				self.theta = other.theta
+				self.theta = 0
+				self.normal = Vec([0,-1])
 				# print(self.theta)
 				return False
 		
@@ -161,11 +170,16 @@ class Ball:
 			# go through each of the points, plus
 			# the next vertex in the list
 			if self.polyCircle(other.points, self.s[0], self.s[1], self.radius):
-				# print("Touched")
+				# print("Touched")			s
+				self.theta = other.theta
+				self.normal = other.normal
+				# print(self.normal.toList(), self.theta)
 				return True
 			else:
+				self.theta = 0
+				self.normal = Vec2([0, -1])
 				self.count += 1
-				print(f"No Touched {self.count} times")
+				# print(f"No Touched {self.count} times")
 				return False
 	
 

@@ -9,6 +9,7 @@ YELLOW = (255, 255, 0)
 import math
 import pygame
 from pygame import rect
+from mymath import *
 
 class Polygon:
 	# (_mass: 질량, _s0: 초기 위치, _v0: 초기 속도, _acc: 물체의 가속도)
@@ -30,9 +31,24 @@ class Polygon:
 		self.color = color
 		A = self.points[3][0]-self.points[0][0]
 		B = self.points[3][1]-self.points[0][1]
-		print(A,B)
-		# self.theta = math.atan(A/B)
-		self.theta = 0
+		C = self.points[0][0]-self.points[1][0]
+		D = self.points[0][1]-self.points[1][1]
+
+		v1 = Vec2([A, B]).normalize()
+		v_ground = Vec2([1, 0]).normalize()
+		self.theta = math.acos(v1.dot(v_ground))
+		self.normal = Vec2([v1.y, -v1.x])
+		v2 = Vec2([C, D]).normalize()
+		if v1.dot(v2) > 0:
+			self.normal *= -1
+
+
+		
+		
+		
+
+
+		# self.theta = 0
 
 
 	# 물체에 중력 이외의 힘을 가한다
