@@ -4,6 +4,7 @@ from poly import *
 import math
 from random import randint 
 import numpy as np
+from kd_tree import *
 
 w, h = 1200, 900
 pygame.init()
