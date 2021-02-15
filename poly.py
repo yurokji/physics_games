@@ -33,22 +33,15 @@ class Polygon:
 		B = self.points[3][1]-self.points[0][1]
 		C = self.points[0][0]-self.points[1][0]
 		D = self.points[0][1]-self.points[1][1]
-
 		v1 = Vec2([A, B]).normalize()
 		v_ground = Vec2([1, 0]).normalize()
 		self.theta = math.acos(v1.dot(v_ground))
 		self.normal = Vec2([v1.y, -v1.x])
+		
 		v2 = Vec2([C, D]).normalize()
-		if v1.dot(v2) > 0:
-			self.normal *= -1
-
-
-		
-		
-		
-
-
-		# self.theta = 0
+		self.tangent = v1
+		# if v1.dot(v2) > 0:
+		# 	self.normal *= -1
 
 
 	# 물체에 중력 이외의 힘을 가한다

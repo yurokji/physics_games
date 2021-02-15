@@ -14,7 +14,7 @@ clock = pygame.time.Clock()
 
 
 
-ball = Ball(s0=[221,492], v0=[0, 0], radius=20, mass=1, color=GREEN)
+ball = Ball(s0=[100,50], v0=[0, 0], radius=10, mass=1.5, color=GREEN)
 # pts1=[(-50,100), (-70, 120), (330, 520), (350, 500)]
 # floor_1 = Polygon(mass=10, points=pts1, size=(300, 10), color=WHITE)
 # pts2=[(330, 500), (330, 520), (530, 520), (530, 500)]
@@ -27,31 +27,26 @@ ball = Ball(s0=[221,492], v0=[0, 0], radius=20, mass=1, color=GREEN)
 
 
 # y = (x- i)^2 + p
-start_x = -10
-end_x = 30
+start_x = -30
+end_x = 20
 xs = np.linspace(start_x, end_x, (end_x-start_x+1)*10)
 ys = xs * xs
-ys = h - ys - 300
+ys = h - ys - 200
 xs *= 20
-xs += w//2 - 200
+xs += w//2 
+
 
 objs = []
 sz = len(xs)
-block_width = 8
+block_width = 4
 for i, x in enumerate(xs):
-	if i < sz -1:
-		# if i < sz / 2: 
+	if i < sz - 2:
 		p1 = (xs[i],ys[i])
 		p2 = (xs[i]-block_width, ys[i])
 		p3 = (xs[i]-block_width, ys[i+1])
 		p4 = (xs[i+1], ys[i+1])
-		# else:
-		# 	p1 = (xs[i],ys[i])
-		# 	p2 = (xs[i]+block_width, ys[i])
-		# 	p3 = (xs[i]+block_width, ys[i+1])
-		# 	p4 = (xs[i+1], ys[i+1])	
-	pts=[p1, p2, p3, p4]
-	objs.append(Polygon(mass=10, points=pts, color=WHITE))
+		pts=[p1, p2, p3, p4]
+		objs.append(Polygon(mass=10, points=pts, color=WHITE))
 	# objs.append(pts)
 
 # balls = [ball]
@@ -75,6 +70,16 @@ while running:
 	
 	for obj in objs:
 		pygame.draw.polygon(screen, obj.color, obj.points, 0)
+		pt = obj.points[0]
+		normal = obj.normal.toList()
+		nx = pt[0] + 30 * normal[0]
+		ny = pt[1] + 30 * normal[1]
+		tangent = obj.tangent.toList()
+		tx = pt[0] + 10 * tangent[0]
+		ty = pt[1] + 10 * tangent[1]
+		pygame.draw.line(screen, (255,0,0), pt, (nx,ny))
+		pygame.draw.circle(screen, (255,255,0), pt, 4, 0)
+		# pygame.draw.line(screen, (0,0,255), pt, (tx,ty))
 
 
 	collided = False
@@ -97,6 +102,6 @@ while running:
 	# 	pygame.draw.circle(screen, WHITE, (x,y), 2, 0)
 
 	pygame.display.update()	
-	clock.tick(360)
+	clock.tick(240)
 	# input()
 

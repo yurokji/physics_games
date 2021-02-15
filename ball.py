@@ -47,8 +47,8 @@ class Ball:
 		# color: 물체의 색상 
 		self.color = color
 		self.theta = 0
-		self.normal = Vec2([0,1])
-
+		self.normal =  Vec2([0,-1])
+		self.tangent = Vec2([1, 0])
 	# 물체에 중력 이외의 힘을 가한다
 	def applyForce(self, force):
 		# 뉴턴의 제 2법칙 가속도 = 힘/질량
@@ -61,11 +61,16 @@ class Ball:
 	def computePos(self, collided, delta_t=0.01):
 		a = [0, 0]
 		if collided:
+			self.theta = math.acos((self.tangent * -1 ).dot(Vec2([-1,0]))) 
+			if self.tangent.dot(Vec2([0,1])) < 0:
+				print("n e g a t i v e")
+				self.theta = math.pi - self.theta
+				
 			a[0] =  self.g[1]*math.sin(self.theta) *math.cos(self.theta) / self.mass
 			a[1] =  self.g[1]*math.sin(self.theta) *math.sin(self.theta) / self.mass
 		else:
-			a[0] = self.g[0] / self.mass
-			a[1] = self.g[1] / self.mass
+			a[0] = self.g[0] 
+			a[1] = self.g[1] 
 
 		if collided:
 			N = self.normal
@@ -75,16 +80,17 @@ class Ball:
 				Vi = Vec2([0,0])
 			else:
 				Vi = Vi.normalize()
+				vmag *= 0.99999
 			cos_phi = N.dot(Vi)
 			Vo = N * 2 * cos_phi - Vi
-			Vo = Vo * vmag *1
+			Vo = Vo * vmag
 			self.v0 = Vo.toList()
 
 			# print(f"N: {self.normal.toList()}")
 			# print(f"Vi: {Vi.toList()}")
 			# print(f"v0: {self.v0}")
 			# print(f"v: {self.v}")
-			# print(f"a: {a}, theta: {self.theta}")		
+		print(f"a: {a}, {self.tangent.toList()}, theta: {math.degrees(self.theta)}")		
 		# if not collided:
 		# 	input()
 		# a = 상수, 즉 등가속도 운동일 경우만 고려
@@ -173,12 +179,14 @@ class Ball:
 				# print("Touched")			s
 				self.theta = other.theta
 				self.normal = other.normal
+				self.tangent = other.tangent
 				# print(self.normal.toList(), self.theta)
 				return True
 			else:
 				self.theta = 0
 				self.normal = Vec2([0, -1])
 				self.count += 1
+				self.tangent = Vec2([1, 0])
 				# print(f"No Touched {self.count} times")
 				return False
 	
@@ -299,7 +307,7 @@ class Ball:
 		# go through each of the points, plus the next
 		# vertex in the list
 		len_p = len(points)
-		next_p = 0;
+		next_p = 0
 		for curr_p in range(len_p):
 			# get next vertex in list
 			# if we've hit the end, wrap around to 0
